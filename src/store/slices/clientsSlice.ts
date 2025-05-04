@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSelector, createSlice} from '@reduxjs/toolkit';
 import {clientsApi} from '../../utils/api';
 import {ApiError, Client, ClientFormData} from '../../types';
 import {RootState} from '../store';
@@ -135,13 +135,11 @@ const clientsSlice = createSlice({
         });
   },
 });
-
-export const {clearSelectedClient, clearError} = clientsSlice.actions;
 export const selectAllClients = (state: RootState) => state.clients.clients;
 export const selectClientById = (state: RootState) => state.clients.selectedClient;
-export const selectActiveClients = (state: RootState) =>
-    state.clients.clients.filter(client => client.status === 'connected');
+export const selectActiveClients = createSelector(
+    [selectAllClients],
+    (clients) => clients.filter(client => client.status === 'connected')
+);
 export const selectClientsStatus = (state: RootState) => state.clients.status;
-export const selectClientsError = (state: RootState) => state.clients.error;
-
 export default clientsSlice.reducer;

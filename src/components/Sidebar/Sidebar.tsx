@@ -1,18 +1,39 @@
-import React, {useState} from 'react';
+import React, {memo, useCallback, useState} from 'react';
 import {NavLink} from 'react-router-dom';
 import {FiActivity, FiHome, FiMenu, FiSettings, FiUsers, FiX} from 'react-icons/fi';
 import * as styles from './Sidebar.module.css';
 
+interface MenuItem {
+  to: string;
+  icon: React.ReactNode;
+  label: string;
+}
+
+const menuItems: MenuItem[] = [
+  {to: "/dashboard", icon: <FiHome className={styles.icon}/>, label: "Dashboard"},
+  {to: "/clients", icon: <FiUsers className={styles.icon}/>, label: "Clients"},
+  {to: "/network", icon: <FiActivity className={styles.icon}/>, label: "Network"},
+  {to: "/settings", icon: <FiSettings className={styles.icon}/>, label: "Settings"},
+];
+
+const NavItem = memo(({item, closeSidebar}: { item: MenuItem; closeSidebar: () => void }) => {
+  return (
+      <NavLink
+          to={item.to}
+          className={({isActive}) => `${styles.navItem} ${isActive ? styles.active : ''}`}
+          onClick={closeSidebar}
+          end
+      >
+        {item.icon}
+        <span>{item.label}</span>
+      </NavLink>
+  )
+});
+
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const closeSidebar = () => {
-    setIsOpen(false);
-  };
+  const toggleSidebar = useCallback(() => setIsOpen(prev => !prev), []);
+  const closeSidebar = useCallback(() => setIsOpen(false), []);
 
   return (
       <>
@@ -28,49 +49,9 @@ const Sidebar: React.FC = () => {
           </div>
 
           <div className={styles.nav}>
-            <NavLink
-                to="/dashboard"
-                className={({isActive}) =>
-                    `${styles.navItem} ${isActive ? styles.active : ''}`
-                }
-                onClick={closeSidebar}
-            >
-              <FiHome className={styles.icon}/>
-              <span>Dashboard</span>
-            </NavLink>
-
-            <NavLink
-                to="/clients"
-                className={({isActive}) =>
-                    `${styles.navItem} ${isActive ? styles.active : ''}`
-                }
-                onClick={closeSidebar}
-            >
-              <FiUsers className={styles.icon}/>
-              <span>Clients</span>
-            </NavLink>
-
-            <NavLink
-                to="/network"
-                className={({isActive}) =>
-                    `${styles.navItem} ${isActive ? styles.active : ''}`
-                }
-                onClick={closeSidebar}
-            >
-              <FiActivity className={styles.icon}/>
-              <span>Network</span>
-            </NavLink>
-
-            <NavLink
-                to="/settings"
-                className={({isActive}) =>
-                    `${styles.navItem} ${isActive ? styles.active : ''}`
-                }
-                onClick={closeSidebar}
-            >
-              <FiSettings className={styles.icon}/>
-              <span>Settings</span>
-            </NavLink>
+            {menuItems.map((item) => (
+                <NavItem key={item.to} item={item} closeSidebar={closeSidebar}/>
+            ))}
           </div>
 
           <div className={styles.footer}>
@@ -78,11 +59,9 @@ const Sidebar: React.FC = () => {
           </div>
         </nav>
 
-        {isOpen && (
-            <div className={styles.overlay} onClick={closeSidebar}/>
-        )}
+        {isOpen && <div className={styles.overlay} onClick={closeSidebar}/>}
       </>
   );
 };
 
-export default Sidebar;
+export default memo(Sidebar);

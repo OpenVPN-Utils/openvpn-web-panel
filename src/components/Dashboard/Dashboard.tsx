@@ -16,10 +16,6 @@ const Dashboard: React.FC = () => {
   const clients = useAppSelector(selectAllClients);
   const activeClients = useAppSelector(selectActiveClients);
 
-  useEffect(() => {
-    dispatch(fetchBandwidthHistory() as any);
-  }, [dispatch]);
-
   return (
       <div className={styles.dashboard}>
         <div className={styles.header}>

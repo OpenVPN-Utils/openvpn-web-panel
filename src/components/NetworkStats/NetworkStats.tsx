@@ -13,10 +13,6 @@ const NetworkStats: React.FC = () => {
   const stats = useAppSelector(selectNetworkStats);
   const bandwidthHistory = useAppSelector(selectBandwidthHistory);
 
-  useEffect(() => {
-    dispatch(fetchBandwidthHistory() as any);
-  }, [dispatch]);
-
   if (!stats) {
     return (
         <div className={styles.loading}>
