@@ -1,14 +1,14 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
-import {useSelector} from 'react-redux';
 import {selectTheme} from '../../store/slices/themeSlice';
 import {selectAllClients} from '../../store/slices/clientsSlice';
 import {formatBytes} from '../../utils/formatters';
 import * as styles from './TrafficChart.module.css';
+import {useAppSelector} from "../../store/store";
 
 const TrafficChart: React.FC = () => {
-  const theme = useSelector(selectTheme);
-  const clients = useSelector(selectAllClients);
+  const theme = useAppSelector(selectTheme);
+  const clients = useAppSelector(selectAllClients);
 
   // Process data for the chart
   const processData = () => {

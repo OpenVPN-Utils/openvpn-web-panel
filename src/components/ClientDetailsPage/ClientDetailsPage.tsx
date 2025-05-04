@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
 import {FiArrowLeft, FiClock, FiDownload, FiServer, FiTrash2, FiUpload, FiUser} from 'react-icons/fi';
 import {deleteClient, fetchClientById, selectClientById} from '../../store/slices/clientsSlice';
 import {formatBytes, formatDateTime} from '../../utils/formatters';
 import * as styles from './ClientDetailsPage.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const ClientDetailsPage: React.FC = () => {
   const {id} = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const client = useSelector(selectClientById);
+  const dispatch = useAppDispatch();
+  const client = useAppSelector(selectClientById);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

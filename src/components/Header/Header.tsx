@@ -1,14 +1,14 @@
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {FiLogOut, FiMoon, FiSun} from 'react-icons/fi';
 import {selectTheme, toggleTheme} from '../../store/slices/themeSlice';
 import {logout, selectAuth} from '../../store/slices/authSlice';
 import * as styles from './Header.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const Header: React.FC = () => {
-  const dispatch = useDispatch();
-  const theme = useSelector(selectTheme);
-  const {user} = useSelector(selectAuth);
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(selectTheme);
+  const {user} = useAppSelector(selectAuth);
 
   const handleThemeToggle = () => {
     dispatch(toggleTheme());

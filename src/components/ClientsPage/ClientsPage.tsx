@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {FiPlus, FiSearch} from 'react-icons/fi';
 import {selectAllClients, selectClientsStatus} from '../../store/slices/clientsSlice';
 import ClientStatusTable from '../ClientStatusTable/ClientStatusTable';
 import ClientForm from '../ClientForm/ClientForm';
 import * as styles from './ClientsPage.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const ClientsPage: React.FC = () => {
-  const dispatch = useDispatch();
-  const clients = useSelector(selectAllClients);
-  const status = useSelector(selectClientsStatus);
+  const dispatch = useAppDispatch();
+  const clients = useAppSelector(selectAllClients);
+  const status = useAppSelector(selectClientsStatus);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);

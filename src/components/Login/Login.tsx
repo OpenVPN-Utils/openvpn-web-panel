@@ -1,18 +1,18 @@
 import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {FiLock, FiMoon, FiSun, FiUser} from 'react-icons/fi';
 import {clearError, login, selectAuth} from '../../store/slices/authSlice';
 import {selectTheme, toggleTheme} from '../../store/slices/themeSlice';
 import * as styles from './Login.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const {isAuthenticated, loading, error} = useSelector(selectAuth);
-  const theme = useSelector(selectTheme);
+  const {isAuthenticated, loading, error} = useAppSelector(selectAuth);
+  const theme = useAppSelector(selectTheme);
 
   useEffect(() => {
     if (isAuthenticated) {

@@ -1,15 +1,15 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
-import {useSelector} from 'react-redux';
 import {selectTheme} from '../../store/slices/themeSlice';
 import * as styles from './LoadAverageChart.module.css';
+import {useAppSelector} from "../../store/store";
 
 interface LoadAverageChartProps {
   loadAverage: number[];
 }
 
 const LoadAverageChart: React.FC<LoadAverageChartProps> = ({loadAverage}) => {
-  const theme = useSelector(selectTheme);
+  const theme = useAppSelector(selectTheme);
 
   if (!loadAverage || loadAverage.length === 0) {
     return <div className={styles.loading}>Loading load average data...</div>;

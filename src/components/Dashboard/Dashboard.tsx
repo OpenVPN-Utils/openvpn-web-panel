@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {fetchBandwidthHistory, selectBandwidthHistory, selectNetworkStats} from '../../store/slices/networkSlice';
 import {selectActiveClients, selectAllClients} from '../../store/slices/clientsSlice';
@@ -8,13 +7,14 @@ import BandwidthChart from '../Charts/BandwidthChart';
 import ClientStatusTable from '../ClientStatusTable/ClientStatusTable';
 import {formatBytes, formatDuration} from '../../utils/formatters';
 import * as styles from './Dashboard.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const Dashboard: React.FC = () => {
-  const dispatch = useDispatch();
-  const stats = useSelector(selectNetworkStats);
-  const bandwidthHistory = useSelector(selectBandwidthHistory);
-  const clients = useSelector(selectAllClients);
-  const activeClients = useSelector(selectActiveClients);
+  const dispatch = useAppDispatch();
+  const stats = useAppSelector(selectNetworkStats);
+  const bandwidthHistory = useAppSelector(selectBandwidthHistory);
+  const clients = useAppSelector(selectAllClients);
+  const activeClients = useAppSelector(selectActiveClients);
 
   useEffect(() => {
     dispatch(fetchBandwidthHistory() as any);

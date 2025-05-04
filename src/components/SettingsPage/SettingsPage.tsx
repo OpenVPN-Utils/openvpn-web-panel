@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {FiMoon, FiSave, FiSun} from 'react-icons/fi';
 import {selectTheme, setTheme} from '../../store/slices/themeSlice';
 import * as styles from './SettingsPage.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const SettingsPage: React.FC = () => {
-  const dispatch = useDispatch();
-  const currentTheme = useSelector(selectTheme);
+  const dispatch = useAppDispatch();
+  const currentTheme = useAppSelector(selectTheme);
 
   const [networkSettings, setNetworkSettings] = useState({
     port: '1194',

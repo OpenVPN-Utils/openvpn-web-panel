@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
-import {useDispatch} from 'react-redux';
 import {FiX} from 'react-icons/fi';
 import {createClient} from '../../store/slices/clientsSlice';
 import {ClientFormData} from '../../types';
 import * as styles from './ClientForm.module.css';
+import {useAppDispatch} from "../../store/store";
 
 interface ClientFormProps {
   onClose: () => void;
@@ -16,7 +16,7 @@ const ClientForm: React.FC<ClientFormProps> = ({onClose}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;

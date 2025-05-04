@@ -1,5 +1,4 @@
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
 import {fetchBandwidthHistory, selectBandwidthHistory, selectNetworkStats} from '../../store/slices/networkSlice';
 import BandwidthChart from '../Charts/BandwidthChart';
 import TrafficChart from '../Charts/TrafficChart';
@@ -7,11 +6,12 @@ import LoadAverageChart from '../Charts/LoadAverageChart';
 import StatCard from '../StatCard/StatCard';
 import {formatBytes, formatDuration} from '../../utils/formatters';
 import * as styles from './NetworkStats.module.css';
+import {useAppDispatch, useAppSelector} from "../../store/store";
 
 const NetworkStats: React.FC = () => {
-  const dispatch = useDispatch();
-  const stats = useSelector(selectNetworkStats);
-  const bandwidthHistory = useSelector(selectBandwidthHistory);
+  const dispatch = useAppDispatch();
+  const stats = useAppSelector(selectNetworkStats);
+  const bandwidthHistory = useAppSelector(selectBandwidthHistory);
 
   useEffect(() => {
     dispatch(fetchBandwidthHistory() as any);

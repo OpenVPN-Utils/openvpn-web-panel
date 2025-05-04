@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {HashRouter, Navigate, Route, Routes} from 'react-router-dom';
-import {useDispatch, useSelector} from 'react-redux';
 import {selectTheme} from './store/slices/themeSlice';
 import Layout from './components/Layout/Layout';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -13,11 +12,12 @@ import {fetchClients} from './store/slices/clientsSlice';
 import {fetchNetworkStats} from './store/slices/networkSlice';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import {selectAuth} from './store/slices/authSlice';
+import {useAppDispatch, useAppSelector} from "./store/store";
 
 const App: React.FC = () => {
-  const theme = useSelector(selectTheme);
-  const {isAuthenticated} = useSelector(selectAuth);
-  const dispatch = useDispatch();
+  const theme = useAppSelector(selectTheme);
+  const {isAuthenticated} = useAppSelector(selectAuth);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -32,7 +32,7 @@ const App: React.FC = () => {
       const intervalId = setInterval(() => {
         dispatch(fetchClients() as any);
         dispatch(fetchNetworkStats() as any);
-      }, 30000); // Every 30 seconds
+      }, 15000); // Every 30 seconds
 
       return () => clearInterval(intervalId);
     }

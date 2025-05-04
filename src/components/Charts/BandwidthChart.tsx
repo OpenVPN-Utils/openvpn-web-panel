@@ -2,16 +2,16 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 import {BandwidthData} from '../../types';
 import {formatBytes} from '../../utils/formatters';
-import {useSelector} from 'react-redux';
 import {selectTheme} from '../../store/slices/themeSlice';
 import * as styles from './BandwidthChart.module.css';
+import {useAppSelector} from "../../store/store";
 
 interface BandwidthChartProps {
   data: BandwidthData[];
 }
 
 const BandwidthChart: React.FC<BandwidthChartProps> = ({data}) => {
-  const theme = useSelector(selectTheme);
+  const theme = useAppSelector(selectTheme);
 
   if (!data || data.length === 0) {
     return <div className={styles.loading}>Loading chart data...</div>;
