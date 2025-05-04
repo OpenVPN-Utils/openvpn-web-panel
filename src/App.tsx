@@ -3,7 +3,7 @@ import {createHashRouter, Navigate, RouterProvider} from 'react-router-dom';
 import {useAppDispatch, useAppSelector} from './store/store';
 import {selectTheme} from './store/slices/themeSlice';
 import {selectAuth} from './store/slices/authSlice';
-import {fetchClients} from './store/slices/clientsSlice';
+import {fetchClientById, fetchClients} from './store/slices/clientsSlice';
 import {fetchBandwidthHistory, fetchNetworkStats} from './store/slices/networkSlice';
 
 import Layout from './components/Layout/Layout';
@@ -61,8 +61,21 @@ const App: React.FC = () => {
             return null;
           }
         },
-        {path: 'clients', element: <ClientsPage/>},
-        {path: 'clients/:id', element: <ClientDetailsPage/>},
+        {
+          path: "clients",
+          children: [
+            {index: true, element: <ClientsPage/>},
+            {
+              path: ":id",
+              element: <ClientDetailsPage/>,
+              loader: ({params}) => {
+                const {id} = params;
+                id && dispatch(fetchClientById(id))
+                return null;
+              },
+            },
+          ],
+        },
         {
           path: 'network', element: <NetworkStats/>, loader: () => {
             dispatch(fetchBandwidthHistory() as any)

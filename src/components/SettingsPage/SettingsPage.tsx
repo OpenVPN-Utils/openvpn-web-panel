@@ -4,67 +4,109 @@ import {selectTheme, setTheme} from '../../store/slices/themeSlice';
 import * as styles from './SettingsPage.module.css';
 import {useAppDispatch, useAppSelector} from "../../store/store";
 
+// Типы для настроек
+interface NetworkSettings {
+  port: string;
+  protocol: string;
+  subnet: string;
+  netmask: string;
+  dns1: string;
+  dns2: string;
+}
+
+interface ServerSettings {
+  maxClients: string;
+  keepalive: string;
+  compression: string;
+  cipher: string;
+  auth: string;
+}
+
+const initialNetworkSettings: NetworkSettings = {
+  port: '1194',
+  protocol: 'udp',
+  subnet: '10.8.0.0',
+  netmask: '255.255.255.0',
+  dns1: '8.8.8.8',
+  dns2: '8.8.4.4',
+};
+
+const initialServerSettings: ServerSettings = {
+  maxClients: '100',
+  keepalive: '10 120',
+  compression: 'lz4',
+  cipher: 'AES-256-GCM',
+  auth: 'SHA256',
+};
+
 const SettingsPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const currentTheme = useAppSelector(selectTheme);
-
-  const [networkSettings, setNetworkSettings] = useState({
-    port: '1194',
-    protocol: 'udp',
-    subnet: '10.8.0.0',
-    netmask: '255.255.255.0',
-    dns1: '8.8.8.8',
-    dns2: '8.8.4.4',
-  });
-
-  const [serverSettings, setServerSettings] = useState({
-    maxClients: '100',
-    keepalive: '10 120',
-    compression: 'lz4',
-    cipher: 'AES-256-GCM',
-    auth: 'SHA256',
-  });
-
+  const [networkSettings, setNetworkSettings] = useState<NetworkSettings>(initialNetworkSettings);
+  const [serverSettings, setServerSettings] = useState<ServerSettings>(initialServerSettings);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleThemeChange = (theme: 'light' | 'dark') => {
-    dispatch(setTheme(theme));
-  };
+  const handleThemeChange = (theme: 'light' | 'dark') => dispatch(setTheme(theme));
 
-  const handleNetworkSettingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleSettingChange = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+      settingsType: 'network' | 'server'
+  ) => {
     const {name, value} = e.target;
-    setNetworkSettings(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    settingsType === 'network'
+        ? setNetworkSettings(prev => ({...prev, [name]: value}))
+        : setServerSettings(prev => ({...prev, [name]: value}));
   };
 
-  const handleServerSettingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const {name, value} = e.target;
-    setServerSettings(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSaveSettings = (e: React.FormEvent) => {
+  const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
 
-    // Simulate saving settings
-    setTimeout(() => {
+    try {
+      // Здесь должна быть реальная логика сохранения
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } finally {
       setIsSaving(false);
-
-      // Show success message
-      const successMessage = document.getElementById('successMessage');
-      if (successMessage) {
-        successMessage.style.display = 'block';
-        setTimeout(() => {
-          successMessage.style.display = 'none';
-        }, 3000);
-      }
-    }, 1000);
+    }
   };
+
+  const renderFormGroup = (
+      label: string,
+      name: string,
+      value: string,
+      type: 'text' | 'select',
+      options?: string[],
+      settingsType: 'network' | 'server' = 'network'
+  ) => (
+      <div className={styles.formGroup}>
+        <label htmlFor={name} className={styles.label}>{label}</label>
+        {type === 'text' ? (
+            <input
+                type="text"
+                id={name}
+                name={name}
+                value={value}
+                onChange={(e) => handleSettingChange(e, settingsType)}
+                className={styles.input}
+            />
+        ) : (
+            <select
+                id={name}
+                name={name}
+                value={value}
+                onChange={(e) => handleSettingChange(e, settingsType)}
+                className={styles.select}
+            >
+              {options?.map(option => (
+                  <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+        )}
+      </div>
+  );
 
   return (
       <div className={styles.settingsPage}>
@@ -87,7 +129,6 @@ const SettingsPage: React.FC = () => {
                   <FiSun size={20}/>
                   <span>Light Theme</span>
                 </button>
-
                 <button
                     className={`${styles.themeButton} ${currentTheme === 'dark' ? styles.activeTheme : ''}`}
                     onClick={() => handleThemeChange('dark')}
@@ -106,79 +147,12 @@ const SettingsPage: React.FC = () => {
               </div>
               <div className={styles.cardContent}>
                 <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="port" className={styles.label}>Port</label>
-                    <input
-                        type="text"
-                        id="port"
-                        name="port"
-                        value={networkSettings.port}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="protocol" className={styles.label}>Protocol</label>
-                    <select
-                        id="protocol"
-                        name="protocol"
-                        value={networkSettings.protocol}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.select}
-                    >
-                      <option value="udp">UDP</option>
-                      <option value="tcp">TCP</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="subnet" className={styles.label}>Subnet</label>
-                    <input
-                        type="text"
-                        id="subnet"
-                        name="subnet"
-                        value={networkSettings.subnet}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="netmask" className={styles.label}>Netmask</label>
-                    <input
-                        type="text"
-                        id="netmask"
-                        name="netmask"
-                        value={networkSettings.netmask}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="dns1" className={styles.label}>Primary DNS</label>
-                    <input
-                        type="text"
-                        id="dns1"
-                        name="dns1"
-                        value={networkSettings.dns1}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="dns2" className={styles.label}>Secondary DNS</label>
-                    <input
-                        type="text"
-                        id="dns2"
-                        name="dns2"
-                        value={networkSettings.dns2}
-                        onChange={handleNetworkSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
+                  {renderFormGroup('Port', 'port', networkSettings.port, 'text')}
+                  {renderFormGroup('Protocol', 'protocol', networkSettings.protocol, 'select', ['udp', 'tcp'])}
+                  {renderFormGroup('Subnet', 'subnet', networkSettings.subnet, 'text')}
+                  {renderFormGroup('Netmask', 'netmask', networkSettings.netmask, 'text')}
+                  {renderFormGroup('Primary DNS', 'dns1', networkSettings.dns1, 'text')}
+                  {renderFormGroup('Secondary DNS', 'dns2', networkSettings.dns2, 'text')}
                 </div>
               </div>
             </div>
@@ -189,75 +163,11 @@ const SettingsPage: React.FC = () => {
               </div>
               <div className={styles.cardContent}>
                 <div className={styles.formGrid}>
-                  <div className={styles.formGroup}>
-                    <label htmlFor="maxClients" className={styles.label}>Max Clients</label>
-                    <input
-                        type="text"
-                        id="maxClients"
-                        name="maxClients"
-                        value={serverSettings.maxClients}
-                        onChange={handleServerSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="keepalive" className={styles.label}>Keepalive (ping interval/timeout)</label>
-                    <input
-                        type="text"
-                        id="keepalive"
-                        name="keepalive"
-                        value={serverSettings.keepalive}
-                        onChange={handleServerSettingChange}
-                        className={styles.input}
-                    />
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="compression" className={styles.label}>Compression</label>
-                    <select
-                        id="compression"
-                        name="compression"
-                        value={serverSettings.compression}
-                        onChange={handleServerSettingChange}
-                        className={styles.select}
-                    >
-                      <option value="lz4">LZ4</option>
-                      <option value="lzo">LZO</option>
-                      <option value="none">None</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="cipher" className={styles.label}>Cipher</label>
-                    <select
-                        id="cipher"
-                        name="cipher"
-                        value={serverSettings.cipher}
-                        onChange={handleServerSettingChange}
-                        className={styles.select}
-                    >
-                      <option value="AES-256-GCM">AES-256-GCM</option>
-                      <option value="AES-128-GCM">AES-128-GCM</option>
-                      <option value="AES-256-CBC">AES-256-CBC</option>
-                      <option value="AES-128-CBC">AES-128-CBC</option>
-                    </select>
-                  </div>
-
-                  <div className={styles.formGroup}>
-                    <label htmlFor="auth" className={styles.label}>Auth</label>
-                    <select
-                        id="auth"
-                        name="auth"
-                        value={serverSettings.auth}
-                        onChange={handleServerSettingChange}
-                        className={styles.select}
-                    >
-                      <option value="SHA256">SHA256</option>
-                      <option value="SHA512">SHA512</option>
-                      <option value="SHA1">SHA1</option>
-                    </select>
-                  </div>
+                  {renderFormGroup('Max Clients', 'maxClients', serverSettings.maxClients, 'text', undefined, 'server')}
+                  {renderFormGroup('Keepalive', 'keepalive', serverSettings.keepalive, 'text', undefined, 'server')}
+                  {renderFormGroup('Compression', 'compression', serverSettings.compression, 'select', ['lz4', 'lzo', 'none'], 'server')}
+                  {renderFormGroup('Cipher', 'cipher', serverSettings.cipher, 'select', ['AES-256-GCM', 'AES-128-GCM', 'AES-256-CBC', 'AES-128-CBC'], 'server')}
+                  {renderFormGroup('Auth', 'auth', serverSettings.auth, 'select', ['SHA256', 'SHA512', 'SHA1'], 'server')}
                 </div>
 
                 <div className={styles.formActions}>
@@ -266,9 +176,7 @@ const SettingsPage: React.FC = () => {
                       className={styles.saveButton}
                       disabled={isSaving}
                   >
-                    {isSaving ? (
-                        'Saving...'
-                    ) : (
+                    {isSaving ? 'Saving...' : (
                         <>
                           <FiSave size={18}/>
                           <span>Save Settings</span>
@@ -276,13 +184,11 @@ const SettingsPage: React.FC = () => {
                     )}
                   </button>
 
-                  <div
-                      id="successMessage"
-                      className={styles.successMessage}
-                      style={{display: 'none'}}
-                  >
-                    Settings saved successfully!
-                  </div>
+                  {showSuccess && (
+                      <div className={styles.successMessage}>
+                        Settings saved successfully!
+                      </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -292,4 +198,4 @@ const SettingsPage: React.FC = () => {
   );
 };
 
-export default SettingsPage;
+export default React.memo(SettingsPage);

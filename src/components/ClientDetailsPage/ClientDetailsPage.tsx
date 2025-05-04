@@ -15,57 +15,69 @@ const ClientDetailsPage: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchClientById(id) as any);
-    }
-  }, [dispatch, id]);
-
   const handleDelete = async () => {
     if (!id) return;
 
+    setIsDeleting(true);
     try {
-      setIsDeleting(true);
-      await dispatch(deleteClient(id) as any);
+      await dispatch(deleteClient(id));
       navigate('/clients');
-    } catch (error) {
-      // Handle error
     } finally {
       setIsDeleting(false);
     }
   };
 
   if (!client) {
-    return (
-        <div className={styles.loading}>
-          Loading client details...
-        </div>
-    );
+    return <div className={styles.loading}>Loading client details...</div>;
   }
+
+  const infoItems = [
+    {icon: <FiUser size={18}/>, title: 'Client ID', value: client.id},
+    {icon: <FiServer size={18}/>, title: 'Virtual IP', value: client.virtualIp},
+    {icon: <FiServer size={18}/>, title: 'Real IP', value: client.realIp},
+    {icon: <FiClock size={18}/>, title: 'Created At', value: formatDateTime(client.createdAt)},
+    {
+      icon: <FiClock size={18}/>,
+      title: client.status === 'connected' ? 'Connected Since' : 'Last Connection',
+      value: client.status === 'connected'
+          ? (client.connectedSince ? formatDateTime(client.connectedSince) : 'N/A')
+          : (client.lastConnection ? formatDateTime(client.lastConnection) : 'Never connected')
+    }
+  ];
+
+  const statsItems = [
+    {icon: <FiDownload size={20}/>, title: 'Downloaded', value: formatBytes(client.bytesReceived)},
+    {icon: <FiUpload size={20}/>, title: 'Uploaded', value: formatBytes(client.bytesSent)}
+  ];
+
+  const actionButtons = [{
+    name: 'Download Configuration',
+    onclick: () => {
+    }
+  }, {
+    name: 'Revoke Access',
+    onclick: () => {
+    }
+  }, {
+    name: 'Reset Connection',
+    onclick: () => {
+    }
+  }];
 
   return (
       <div className={styles.clientDetails}>
         <div className={styles.header}>
-          <button
-              className={styles.backButton}
-              onClick={() => navigate('/clients')}
-          >
-            <FiArrowLeft size={18}/>
-            <span>Back to Clients</span>
+          <button className={styles.backButton} onClick={() => navigate('/clients')}>
+            <FiArrowLeft size={18}/> Back to Clients
           </button>
-
-          <button
-              className={styles.deleteButton}
-              onClick={() => setShowDeleteModal(true)}
-          >
-            <FiTrash2 size={18}/>
-            <span>Delete Client</span>
+          <button className={styles.deleteButton} onClick={() => setShowDeleteModal(true)}>
+            <FiTrash2 size={18}/> Delete Client
           </button>
         </div>
 
         <div className={styles.clientCard}>
           <div className={styles.clientHeader}>
-            <h1 className={styles.clientName}>{client.name}</h1>
+            <h1>{client.name}</h1>
             <div
                 className={`${styles.statusBadge} ${client.status === 'connected' ? styles.connected : styles.disconnected}`}>
               {client.status === 'connected' ? 'Connected' : 'Disconnected'}
@@ -73,105 +85,42 @@ const ClientDetailsPage: React.FC = () => {
           </div>
 
           <div className={styles.infoGrid}>
-            <div className={styles.infoItem}>
-              <div className={styles.infoIcon}>
-                <FiUser size={18}/>
-              </div>
-              <div className={styles.infoContent}>
-                <h3 className={styles.infoTitle}>Client ID</h3>
-                <p className={styles.infoValue}>{client.id}</p>
-              </div>
-            </div>
-
-            <div className={styles.infoItem}>
-              <div className={styles.infoIcon}>
-                <FiServer size={18}/>
-              </div>
-              <div className={styles.infoContent}>
-                <h3 className={styles.infoTitle}>Virtual IP</h3>
-                <p className={styles.infoValue}>{client.virtualIp}</p>
-              </div>
-            </div>
-
-            <div className={styles.infoItem}>
-              <div className={styles.infoIcon}>
-                <FiServer size={18}/>
-              </div>
-              <div className={styles.infoContent}>
-                <h3 className={styles.infoTitle}>Real IP</h3>
-                <p className={styles.infoValue}>{client.realIp}</p>
-              </div>
-            </div>
-
-            <div className={styles.infoItem}>
-              <div className={styles.infoIcon}>
-                <FiClock size={18}/>
-              </div>
-              <div className={styles.infoContent}>
-                <h3 className={styles.infoTitle}>Created At</h3>
-                <p className={styles.infoValue}>{formatDateTime(client.createdAt)}</p>
-              </div>
-            </div>
-
-            <div className={styles.infoItem}>
-              <div className={styles.infoIcon}>
-                <FiClock size={18}/>
-              </div>
-              <div className={styles.infoContent}>
-                <h3 className={styles.infoTitle}>
-                  {client.status === 'connected' ? 'Connected Since' : 'Last Connection'}
-                </h3>
-                <p className={styles.infoValue}>
-                  {client.status === 'connected' && client.connectedSince
-                      ? formatDateTime(client.connectedSince)
-                      : client.lastConnection
-                          ? formatDateTime(client.lastConnection)
-                          : 'Never connected'
-                  }
-                </p>
-              </div>
-            </div>
+            {infoItems.map((item, index) => (
+                <div key={index} className={styles.infoItem}>
+                  <div className={styles.infoIcon}>{item.icon}</div>
+                  <div className={styles.infoContent}>
+                    <h3>{item.title}</h3>
+                    <p>{item.value}</p>
+                  </div>
+                </div>
+            ))}
           </div>
 
           <div className={styles.statsSection}>
-            <h2 className={styles.sectionTitle}>Traffic Statistics</h2>
-
+            <h2>Traffic Statistics</h2>
             <div className={styles.statsGrid}>
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>
-                  <FiDownload size={20}/>
-                </div>
-                <div className={styles.statContent}>
-                  <h3 className={styles.statTitle}>Downloaded</h3>
-                  <p className={styles.statValue}>{formatBytes(client.bytesReceived)}</p>
-                </div>
-              </div>
-
-              <div className={styles.statCard}>
-                <div className={styles.statIcon}>
-                  <FiUpload size={20}/>
-                </div>
-                <div className={styles.statContent}>
-                  <h3 className={styles.statTitle}>Uploaded</h3>
-                  <p className={styles.statValue}>{formatBytes(client.bytesSent)}</p>
-                </div>
-              </div>
+              {statsItems.map((stat, index) => (
+                  <div key={index} className={styles.statCard}>
+                    <div className={styles.statIcon}>{stat.icon}</div>
+                    <div className={styles.statContent}>
+                      <h3>{stat.title}</h3>
+                      <p>{stat.value}</p>
+                    </div>
+                  </div>
+              ))}
             </div>
           </div>
 
           <div className={styles.actionsSection}>
-            <h2 className={styles.sectionTitle}>Client Actions</h2>
-
+            <h2>Client Actions</h2>
             <div className={styles.actionButtons}>
-              <button className={styles.actionButton}>
-                Download Configuration
-              </button>
-              <button className={styles.actionButton}>
-                Revoke Access
-              </button>
-              <button className={styles.actionButton}>
-                Reset Connection
-              </button>
+              {actionButtons.map((buttonConfig, index) => (
+                  <button key={index}
+                          className={styles.actionButton}
+                          onClick={buttonConfig.onclick}>
+                    {buttonConfig.name}
+                  </button>
+              ))}
             </div>
           </div>
         </div>
@@ -179,10 +128,8 @@ const ClientDetailsPage: React.FC = () => {
         {showDeleteModal && (
             <div className={styles.modalOverlay}>
               <div className={styles.modal}>
-                <h2 className={styles.modalTitle}>Delete Client</h2>
-                <p className={styles.modalText}>
-                  Are you sure you want to delete client "{client.name}"? This action cannot be undone.
-                </p>
+                <h2>Delete Client</h2>
+                <p>Are you sure you want to delete client "{client.name}"? This action cannot be undone.</p>
                 <div className={styles.modalActions}>
                   <button
                       className={styles.cancelButton}
